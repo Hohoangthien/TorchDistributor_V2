@@ -20,7 +20,7 @@ from project.data.data_loader import create_pytorch_dataloader
 from project.training.trainer import training_function
 from project.training.evaluator import evaluate_loop
 from project.models import create_model
-from project.utils.hdfs_utils import save_and_upload_report
+from project.utils.hdfs_utils import save_and_upload_report, delete_hdfs_directory
 from project.utils.visualization import plot_and_save_confusion_matrix
 from sklearn.metrics import classification_report, confusion_matrix
 
@@ -131,22 +131,12 @@ def main():
             f"\n{model_type.upper()} training failed! Error: {result.get('message', 'Unknown error')}"
         )
 
-    # --- Cleanup Alluxio tmp ---
-    # print("\nCleaning up temporary directories...")
-    # test_temp_dir = f"{temp_dir_base}/test_data_{model_type}_{timestamp}"
-    # cleanup_dirs = [train_temp_dir, val_temp_dir, test_temp_dir]
-    # for temp_dir in cleanup_dirs:
-    #     try:
-    #         parsed_uri = urlparse(temp_dir)
-    #         hdfs = pyarrow.fs.HadoopFileSystem(
-    #             host=parsed_uri.hostname, port=parsed_uri.port
-    #         )
-    #         if hdfs.get_file_info(parsed_uri.path).type != pyarrow.fs.FileType.NotFound:
-    #             hdfs.delete_dir(temp_dir)
-    #             print(f"[CLEANUP] Removed {temp_dir}")
-    #     except Exception as e:
-    #         print(f"[CLEANUP] Failed to remove {temp_dir}: {e}")
-
+    # --- Cleanup temporary directories ---
+    print("\nCleaning up temporary directories...")
+    test_temp_dir = f"{temp_dir_base}/test_data_{model_type}_{timestamp}"
+    delete_hdfs_directory(train_temp_dir)
+    delete_hdfs_directory(val_temp_dir)
+    delete_hdfs_directory(test_temp_dir)
 
     spark.stop()
     print(f"\n{config['project_name']} Pipeline completed!")

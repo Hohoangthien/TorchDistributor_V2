@@ -39,4 +39,18 @@ def save_and_upload_report(report_data, filename, output_dir):
     if output_dir.startswith("hdfs://"):
         upload_local_directory_to_hdfs(local_tmp_dir, output_dir)
     shutil.rmtree(local_tmp_dir)
-    
+
+
+def delete_hdfs_directory(dir_uri):
+    """Safely deletes a directory on a distributed filesystem (HDFS, Alluxio)."""
+    if not dir_uri:
+        return
+    try:
+        fs, path = pyarrow.fs.FileSystem.from_uri(dir_uri)
+        if fs.get_file_info(path).type != pyarrow.fs.FileType.NotFound:
+            fs.delete_dir(path)
+            print(f"[CLEANUP] Removed directory: {dir_uri}")
+        else:
+            print(f"[CLEANUP] Directory not found, skipping: {dir_uri}")
+    except Exception as e:
+        print(f"[CLEANUP] Failed to remove {dir_uri}: {e}")
