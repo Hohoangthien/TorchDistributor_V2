@@ -125,18 +125,28 @@ def main():
     # --- Process results ---
     if isinstance(result, dict) and result.get("status") == "SUCCESS":
         print(f"\n{model_type.upper()} training completed successfully!")
-        # Pass the full, updated args to the final evaluation function
         evaluate_on_test_set(result, distributor_args)
     else:
         print(
             f"\n{model_type.upper()} training failed! Error: {result.get('message', 'Unknown error')}"
         )
 
-    # --- Cleanup ---
-    print("\nCleaning up temporary directories...")
-    test_temp_dir = f"{temp_dir_base}/test_data_{model_type}_{timestamp}"
-    cleanup_dirs = [train_temp_dir, val_temp_dir, test_temp_dir]
-    # ... (cleanup logic)
+    # --- Cleanup Alluxio tmp ---
+    # print("\nCleaning up temporary directories...")
+    # test_temp_dir = f"{temp_dir_base}/test_data_{model_type}_{timestamp}"
+    # cleanup_dirs = [train_temp_dir, val_temp_dir, test_temp_dir]
+    # for temp_dir in cleanup_dirs:
+    #     try:
+    #         parsed_uri = urlparse(temp_dir)
+    #         hdfs = pyarrow.fs.HadoopFileSystem(
+    #             host=parsed_uri.hostname, port=parsed_uri.port
+    #         )
+    #         if hdfs.get_file_info(parsed_uri.path).type != pyarrow.fs.FileType.NotFound:
+    #             hdfs.delete_dir(temp_dir)
+    #             print(f"[CLEANUP] Removed {temp_dir}")
+    #     except Exception as e:
+    #         print(f"[CLEANUP] Failed to remove {temp_dir}: {e}")
+
 
     spark.stop()
     print(f"\n{config['project_name']} Pipeline completed!")

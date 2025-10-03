@@ -5,7 +5,9 @@
 # --- CRITICAL: ALLUXIO INTEGRATION ---
 ALLUXIO_CLIENT_JAR="/usr/local/alluxio/client/alluxio-2.9.4-client.jar"
 # --- Application Configuration ---
-MODE_SPARK="spark-cluster3"
+# MODE_SPARK="spark-cluster3"
+MODE_SPARK="spark-client"
+
 CONFIG_FILE="config.yaml"
 
 # --- Load Spark parameters from config.yaml ---

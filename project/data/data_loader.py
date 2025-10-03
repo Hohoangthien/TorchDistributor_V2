@@ -26,8 +26,6 @@ class ParquetStreamingDataset(IterableDataset):
         if not self.batch_size:
             return 0
         if self.num_samples == 0:
-            # For evaluation sets where we don't pre-count, return 1 as a placeholder
-            # to allow the DataLoader to start. The loop will stop when the iterator is exhausted.
             return 1
         return math.ceil(self.num_samples / self.batch_size)
 
@@ -38,8 +36,6 @@ class ParquetStreamingDataset(IterableDataset):
 
         uri = self.file_paths[0]
         try:
-            # This automatically creates the correct filesystem object (HDFS, Alluxio, etc.)
-            # from the URI scheme, provided the necessary drivers are on the classpath.
             self.hdfs = pyarrow.fs.HadoopFileSystem.from_uri(uri)
         except Exception as e:
             print(f"[DATASET_ERROR] Failed to initialize filesystem for URI '{uri}': {e}")

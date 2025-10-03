@@ -39,3 +39,4 @@ def save_and_upload_report(report_data, filename, output_dir):
     if output_dir.startswith("hdfs://"):
         upload_local_directory_to_hdfs(local_tmp_dir, output_dir)
     shutil.rmtree(local_tmp_dir)
+    
