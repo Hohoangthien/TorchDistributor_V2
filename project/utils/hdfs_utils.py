@@ -46,7 +46,11 @@ def delete_hdfs_directory(dir_uri):
     if not dir_uri:
         return
     try:
-        fs, path = pyarrow.fs.FileSystem.from_uri(dir_uri)
+        # Explicitly use HadoopFileSystem which can handle hdfs:// and alluxio:// schemes
+        fs = pyarrow.fs.HadoopFileSystem.from_uri(dir_uri)
+        path = urlparse(dir_uri).path
+
+        # Check if directory exists before attempting to delete
         if fs.get_file_info(path).type != pyarrow.fs.FileType.NotFound:
             fs.delete_dir(path)
             print(f"[CLEANUP] Removed directory: {dir_uri}")
