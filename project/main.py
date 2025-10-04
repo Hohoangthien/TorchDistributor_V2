@@ -178,6 +178,11 @@ def evaluate_on_test_set(training_result, args):
             SparkSession.getActiveSession(), test_data_path, 1, test_temp_dir
         )
 
+        # Add a small delay to allow Alluxio to fully commit the data for short-circuit reads
+        logger.info("Waiting for 3 seconds to allow data to settle in Alluxio...")
+        import time
+        time.sleep(3)
+
         test_dataloader = create_pytorch_dataloader(
             test_paths, args["batch_size"] * 2, test_samples, is_training=False
         )
