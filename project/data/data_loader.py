@@ -30,7 +30,7 @@ class ParquetStreamingDataset(IterableDataset):
         return math.ceil(self.num_samples / self.batch_size)
 
     def _init_filesystem(self):
-        """Initializes a generic HDFS-compatible filesystem from the file URI."""
+        """Initializes a generic HDFS-compatible filesystem from the file URI...."""
         if self.hdfs or not self.file_paths:
             return
 
