@@ -23,7 +23,10 @@ from project.models import create_model
 from project.utils.hdfs_utils import save_and_upload_report, delete_hdfs_directory
 from project.utils.visualization import plot_and_save_confusion_matrix
 from sklearn.metrics import classification_report, confusion_matrix
+from project.utils.logger import setup_logger
 
+
+logger = setup_logger(rank=int(os.environ.get("RANK", 0)))
 
 def main():
     cli_args = parse_cli_args()
@@ -37,9 +40,9 @@ def main():
 
     spark = init_spark(spark_config["deploy_mode"])
 
-    print(f"\nStarting {config['project_name']}")
+    logger.info(f"\nStarting {config['project_name']}")
     model_type = training_config["model_type"]
-    print(f"Selected Model: {model_type.upper()}")
+    logger.info(f"Selected Model: {model_type.upper()}")
 
     # --- Prepare model parameters ---
     final_model_params = model_params_config.get("default", {})
@@ -68,7 +71,7 @@ def main():
         )
         distributor_args["num_features"] = first_row["scaled_features"].size
     except Exception as e:
-        print(f"Error reading metadata: {e}. Using defaults.")
+        logger.info(f"Error reading metadata: {e}. Using defaults.")
         (
             distributor_args["num_classes"],
             distributor_args["class_names"],
@@ -110,7 +113,7 @@ def main():
     distributor_args["steps_per_epoch"] = steps_per_epoch
 
     if not any(files_per_worker):
-        print("[ERROR] Training data preparation failed.")
+        logger.info("[ERROR] Training data preparation failed.")
         spark.stop()
         return
 
@@ -124,27 +127,27 @@ def main():
 
     # --- Process results ---
     if isinstance(result, dict) and result.get("status") == "SUCCESS":
-        print(f"\n{model_type.upper()} training completed successfully!")
+        logger.info(f"\n{model_type.upper()} training completed successfully!")
         evaluate_on_test_set(result, distributor_args)
     else:
-        print(
+        logger.info(
             f"\n{model_type.upper()} training failed! Error: {result.get('message', 'Unknown error')}"
         )
 
     # --- Cleanup temporary directories ---
-    print("\nCleaning up temporary directories...")
+    logger.info("\nCleaning up temporary directories...")
     test_temp_dir = f"{temp_dir_base}/test_data_{model_type}_{timestamp}"
     delete_hdfs_directory(train_temp_dir)
     delete_hdfs_directory(val_temp_dir)
     delete_hdfs_directory(test_temp_dir)
 
     spark.stop()
-    print(f"\n{config['project_name']} Pipeline completed!")
+    logger.info(f"\n{config['project_name']} Pipeline completed!")
 
 
 def evaluate_on_test_set(training_result, args):
     """Loads the best model and evaluates it on the test set."""
-    print(f"\nStarting FINAL evaluation on TEST set...")
+    logger.info(f"\nStarting FINAL evaluation on TEST set...")
 
     # Extract correct paths
     data_paths = args["data_source_paths"]
@@ -158,7 +161,7 @@ def evaluate_on_test_set(training_result, args):
         model_path_hdfs = os.path.join(
             output_dir, f"best_{args['model_type']}_model.pth"
         )
-        print(f"Loading BEST model from artifact storage: {model_path_hdfs}")
+        logger.info(f"Loading BEST model from artifact storage: {model_path_hdfs}")
         model = create_model(**args)
 
         fs, hdfs_model_path = pyarrow.fs.FileSystem.from_uri(model_path_hdfs)
@@ -166,7 +169,7 @@ def evaluate_on_test_set(training_result, args):
             model.load_state_dict(torch.load(f, weights_only=True))
 
         model.to(torch.device("cpu"))
-        print("Model loaded successfully.")
+        logger.info("Model loaded successfully.")
 
         # 2. Prepare test data from Alluxio
         timestamp = output_dir.split("_")[-1]
@@ -184,8 +187,8 @@ def evaluate_on_test_set(training_result, args):
             _, test_acc, all_labels, all_preds = evaluate_loop(
                 model, test_dataloader, nn.CrossEntropyLoss(), torch.device("cpu")
             )
-            print(f"--- FINAL TEST SET PERFORMANCE ({args['model_type'].upper()}) ---")
-            print(f"  Test Accuracy: {test_acc:.4f}")
+            logger.info(f"--- FINAL TEST SET PERFORMANCE ({args['model_type'].upper()}) ---")
+            logger.info(f"  Test Accuracy: {test_acc:.4f}")
 
             # 4. Save reports to HDFS
             report = classification_report(
@@ -205,8 +208,8 @@ def evaluate_on_test_set(training_result, args):
     except Exception as e:
         import traceback
 
-        print(f"[ERROR] Could not perform final evaluation: {e}")
-        traceback.print_exc()
+        logger.info(f"[ERROR] Could not perform final evaluation: {e}")
+        traceback.logger.info_exc()
 
 
 if __name__ == "__main__":

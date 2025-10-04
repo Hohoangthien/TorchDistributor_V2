@@ -7,10 +7,21 @@ active_storage: alluxio
 data_source:
   # Alluxio master address
   base_path: "alluxio://master:19998/usr/ubuntu/data/classweights-43-21"
-  train_path: "{base_path}/mini_train_df.parquet"
+  train_path: "{base_path}/train_df.parquet"
   test_path: "{base_path}/test_df.parquet"
   label_indexer_path: "{base_path}/data/label_indexer/label_indexer"
   temp_dir: "alluxio://master:19998/tmp"
+
+# active_storage: hdfs
+
+# # --- STORAGE CONFIGURATIONS ---
+# data_source:
+#   # HDFS master address
+#   base_path: "hdfs://master:9000/usr/ubuntu/data/classweights-43-21"
+#   train_path: "{base_path}/mini_train_df.parquet"
+#   test_path: "{base_path}/test_df.parquet"
+#   label_indexer_path: "{base_path}/data/label_indexer/label_indexer"
+#   temp_dir: "hdfs://master:9000/tmp"
 
 # --- Artifact Storage Configuration (Where to WRITE final results) ---
 artifact_storage:
@@ -24,7 +35,7 @@ training:
   model_type: gru
   epochs: 1
   batch_size: 1024
-  num_processes: 1  # Number of parallel processes for data loading | Equal to num_executors
+  num_processes: 12  # Number of parallel processes for data loading | Equal to num_executors
   learning_rate: 0.01
 
 # Spark configuration
