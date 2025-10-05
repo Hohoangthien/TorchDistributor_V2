@@ -12,7 +12,7 @@ from project.utils.logger import setup_logger
 from project.models import create_model
 from project.data.data_loader import create_pytorch_dataloader
 from project.utils.visualization import plot_and_save_history
-from project.utils.hdfs_utils import upload_local_directory_to_hdfs
+from project.utils.hdfs_utils import upload_log_file, upload_local_directory_to_hdfs
 from project.training.evaluator import evaluate_loop
 
 
@@ -139,22 +139,16 @@ def training_function(args_dict):
 
         # --- Final Upload (on rank 0) ---
         if rank == 0:
-            # Create a temporary directory to hold artifacts for upload
-            upload_dir = "/tmp/upload_artifacts"
-            os.makedirs(upload_dir, exist_ok=True)
-
             local_model_path = f"/tmp/best_{model_type}_model.pth"
-
-            # Move model and log file to the upload directory
             if os.path.exists(local_model_path):
-                os.rename(local_model_path, os.path.join(upload_dir, os.path.basename(local_model_path)))
-            if log_file and os.path.exists(log_file):
-                os.rename(log_file, os.path.join(upload_dir, os.path.basename(log_file)))
+                # Create a temporary directory for the model to be uploaded
+                model_upload_dir = "/tmp/model_upload"
+                os.makedirs(model_upload_dir, exist_ok=True)
+                os.rename(local_model_path, os.path.join(model_upload_dir, os.path.basename(local_model_path)))
+                logger.info(f"Uploading model from {model_upload_dir} to {final_output_dir}")
+                upload_local_directory_to_hdfs(model_upload_dir, final_output_dir)
 
-            # Upload the directory to HDFS
-            if os.listdir(upload_dir):
-                logger.info(f"Uploading artifacts from {upload_dir} to {final_output_dir}")
-                upload_local_directory_to_hdfs(upload_dir, final_output_dir)
+            upload_log_file(log_file, final_output_dir)
 
         if world_size > 1:
             dist.barrier()
