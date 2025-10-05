@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+# BASIC ENVIRONMENT (same as master)
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop
+export SPARK_DIST_CLASSPATH=$(/usr/local/hadoop/bin/hadoop classpath)
+
+# NETWORK CONFIGURATION (same as master)
+export SPARK_MASTER_HOST=master
+export SPARK_LOCAL_IP=$(hostname -i)
+
+# PYTHON ENVIRONMENT (same as master)
+export PYSPARK_PYTHON=python3
+export PYSPARK_DRIVER_PYTHON=python3
+
+# WORKER SPECIFIC: Full resources
+export SPARK_DAEMON_MEMORY=1g        # Standard daemon memory
+export SPARK_WORKER_MEMORY=248g       # 248GB for worker (leave 2GB for system)
+export SPARK_WORKER_CORES=16          # All 16 cores available
+export SPARK_WORKER_INSTANCES=1      # One worker per node
+
+# JVM OPTIONS (same as master)
+export SPARK_DAEMON_JAVA_OPTS="-Djava.net.preferIPv4Stack=true -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=4 -XX:ConcGCThreads=2 -XX:InitiatingHeapOccupancyPercent=35"
+
+export SPARK_DRIVER_JAVA_OPTS="-Djava.net.preferIPv4Stack=true -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:G1HeapRegionSize=16m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/spark-driver-heap.hprof"
+
+export SPARK_EXECUTOR_JAVA_OPTS="-Djava.net.preferIPv4Stack=true -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:G1HeapRegionSize=16m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/spark-executor-heap.hprof"
+
+# Rest same as master...
+export SPARK_LOG_LEVEL=INFO
+export SPARK_LOG_DIR=/usr/local/spark/logs
+export SPARK_PID_DIR=/usr/local/spark/run
+export SPARK_LOCAL_DIRS=/tmp/spark-local
+export SPARK_WORKER_DIR=/tmp/spark-worker
+
+# ML environment
+export TORCH_DISTRIBUTED_DEBUG=DETAIL
+export GLOO_LOG_LEVEL=DEBUG
+export OMP_NUM_THREADS=1
+export MPLCONFIGDIR=/tmp/matplotlib_cache
+export MASTER_ADDR=master
+export MASTER_PORT=29500
+export GLOO_SOCKET_IFNAME=eth0
+
+echo "[INFO] WORKER node $(hostname) configured for processing"
+echo "  DAEMON_MEMORY: $SPARK_DAEMON_MEMORY"
+echo "  WORKER_MEMORY: $SPARK_WORKER_MEMORY"
+echo "  WORKER_CORES: $SPARK_WORKER_CORES"
