@@ -58,3 +58,25 @@ def delete_hdfs_directory(dir_uri):
             print(f"[CLEANUP] Directory not found, skipping: {dir_uri}")
     except Exception as e:
         print(f"[CLEANUP] Failed to remove {dir_uri}: {e}")
+
+def upload_log_file(local_log_path, hdfs_output_dir):
+    """Uploads a single log file to a specified HDFS directory."""
+    if not local_log_path or not os.path.exists(local_log_path):
+        print(f"[LOG UPLOAD] Log file not found at {local_log_path}, skipping upload.")
+        return
+
+    try:
+        print(f"[LOG UPLOAD] Uploading {local_log_path} to {hdfs_output_dir}")
+        # Use a temporary directory to upload the single file
+        upload_dir = tempfile.mkdtemp()
+        shutil.copy(local_log_path, upload_dir)
+        
+        upload_local_directory_to_hdfs(upload_dir, hdfs_output_dir)
+        
+        # Clean up the temporary directory
+        shutil.rmtree(upload_dir)
+        # Clean up the original log file
+        os.remove(local_log_path)
+
+    except Exception as e:
+        print(f"[LOG UPLOAD] Failed to upload log file {local_log_path}: {e}")

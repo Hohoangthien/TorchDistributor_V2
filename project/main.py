@@ -20,13 +20,15 @@ from project.data.data_loader import create_pytorch_dataloader
 from project.training.trainer import training_function
 from project.training.evaluator import evaluate_loop
 from project.models import create_model
-from project.utils.hdfs_utils import save_and_upload_report, delete_hdfs_directory
+from project.utils.hdfs_utils import save_and_upload_report, delete_hdfs_directory, upload_log_file
 from project.utils.visualization import plot_and_save_confusion_matrix
 from sklearn.metrics import classification_report, confusion_matrix
 from project.utils.logger import setup_logger
 
 
-logger = setup_logger(rank=int(os.environ.get("RANK", 0)))
+# Initialize logger for the driver
+driver_log_file = "/tmp/driver.log"
+logger = setup_logger(rank="DRIVER", log_file=driver_log_file)
 
 def main():
     cli_args = parse_cli_args()
@@ -141,8 +143,10 @@ def main():
     delete_hdfs_directory(val_temp_dir)
     delete_hdfs_directory(test_temp_dir)
 
+    # --- Upload Driver Log ---
+    upload_log_file(driver_log_file, final_output_dir)
+
     spark.stop()
-    logger.info(f"\n{config['project_name']} Pipeline completed!")
 
 
 def evaluate_on_test_set(training_result, args):
