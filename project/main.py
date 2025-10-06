@@ -114,6 +114,12 @@ def main():
     steps_per_epoch = total_samples // global_batch_size if global_batch_size > 0 else 0
     distributor_args["steps_per_epoch"] = steps_per_epoch
 
+    # Show prepared configuration
+    logger.info("\n[ƯPrepared Configuration for Training:")
+    for key, value in distributor_args.items():
+        if key not in ["files_per_worker", "samples_per_worker"]:
+            logger.info(f"  {key}: {value}")
+
     if not any(files_per_worker):
         logger.info("[ERROR] Training data preparation failed.")
         spark.stop()
