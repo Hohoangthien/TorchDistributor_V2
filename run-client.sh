@@ -5,12 +5,11 @@
 # --- CRITICAL: ALLUXIO INTEGRATION ---
 ALLUXIO_CLIENT_JAR="/usr/local/alluxio/client/alluxio-2.9.4-client.jar"
 # --- Application Configuration ---
-MODE_SPARK="spark-cluster3"
-# MODE_SPARK="spark-client"
+MODE_SPARK="spark-client"
 
-CONFIG_FILE="config.yaml"
+CONFIG_FILE="config-client.yaml"
 
-# --- Load Spark parameters from config.yaml ---
+# --- Load Spark parameters from config-client.yaml ---
 if command -v yq >/dev/null 2>&1; then
     SPARK_MASTER=$(yq ."$MODE_SPARK.master" "$CONFIG_FILE")
     DEPLOY_MODE=$(yq ."$MODE_SPARK.deploy_mode" "$CONFIG_FILE")
@@ -42,8 +41,11 @@ else
 fi
 
 # --- Packaging the project ---
-echo "Packaging project files into project-cluster.zip..."
-zip -r project-cluster.zip project/ -x "*__pycache__*" "*.pyc"
+echo "Packaging project files into project.zip..."
+
+# Create a unique zip file to avoid conflicts
+rm -f project.zip
+zip -r project.zip project/ -x "*__pycache__*" "*.pyc"
 
 # --- Main execution command ---
 echo "Submitting Spark job..."
@@ -54,7 +56,7 @@ spark-submit \
 --executor-memory ${EXECUTOR_MEMORY} \
 --executor-cores ${EXECUTOR_CORES} \
 --driver-memory ${DRIVER_MEMORY} \
---py-files project-cluster.zip \
+--py-files project.zip \
 --files ${CONFIG_FILE} \
 --conf spark.executor.memoryOverhead=${EXECUTOR_MEMORY_OVERHEAD} \
 ${SPARK_JARS_CONF} \
@@ -65,7 +67,7 @@ project/main.py --config ${CONFIG_FILE}
 # --- Cleanup ---
 EXIT_CODE=$?
 echo "Cleaning up packaged file..."
-rm project-cluster.zip
+rm project.zip
 
 echo "Spark job finished with exit code: $EXIT_CODE"
 exit $EXIT_CODE
