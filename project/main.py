@@ -102,9 +102,19 @@ def main():
         train_temp_dir,
     )
 
-    final_output_dir = (
-        f"{artifact_storage_config['output_dir']}_{model_type}_{timestamp}"
-    )
+    # If an output directory is provided via CLI, use it directly.
+    # Otherwise, construct it from the config and a timestamp.
+    if cli_args.output_dir:
+        final_output_dir = cli_args.output_dir
+        # Ensure the timestamp is appended if not already present for uniqueness
+        if not any(char.isdigit() for char in os.path.basename(final_output_dir)):
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            final_output_dir = f"{final_output_dir}_{model_type}_{timestamp}"
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        final_output_dir = (
+            f"{artifact_storage_config['output_dir']}_{model_type}_{timestamp}"
+        )
     distributor_args["artifact_storage_paths"]["output_dir"] = final_output_dir
 
     num_workers = training_config["num_processes"]

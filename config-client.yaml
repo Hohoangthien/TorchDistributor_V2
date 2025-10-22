@@ -20,7 +20,6 @@ data_source:
 #   label_indexer_path: "{base_path}/data/label_indexer/label_indexer"
 #   temp_dir: "hdfs://master:9000/tmp"
 
-# # --- Artifact Storage Configuration (Where to WRITE final results) ---
 artifact_storage:
   output_dir: "hdfs://master:9000/usr/ubuntu/client-results-ultra"
 

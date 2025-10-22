@@ -35,4 +35,10 @@ def parse_cli_args() -> argparse.Namespace:
         default="config.yaml",
         help="Path to the configuration YAML file."
     )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default=None,
+        help="Path to the override the output directory e.g., hdfs://master:9000/usr/ubuntu/my_results."
+    )
     return parser.parse_args()
