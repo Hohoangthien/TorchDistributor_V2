@@ -22,14 +22,14 @@ data_source:
 
 # # --- Artifact Storage Configuration (Where to WRITE final results) ---
 artifact_storage:
-  output_dir: "hdfs://master:9000/usr/ubuntu/results-ultra"
+  output_dir: "hdfs://master:9000/usr/ubuntu/client-results-ultra"
 
 # General project settings
 project_name: Multi_Model_NIDS_Training
 
 # Training process settings
 training:
-  model_type: lstm
+  model_type: gru
   epochs: 35
   batch_size: 1024
   num_processes: 1  # Number of parallel processes for data loading | Equal to num_executors

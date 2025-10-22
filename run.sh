@@ -1,14 +1,11 @@
 #!/bin/bash
 
-# Script to run the Spark training job using a configuration file.
-
-# --- CRITICAL: ALLUXIO INTEGRATION ---
 ALLUXIO_CLIENT_JAR="/usr/local/alluxio/client/alluxio-2.9.4-client.jar"
 # --- Application Configuration ---
 MODE_SPARK="spark-cluster3"
-# MODE_SPARK="spark-client"
 
 CONFIG_FILE="config.yaml"
+
 
 # --- Load Spark parameters from config.yaml ---
 if command -v yq >/dev/null 2>&1; then

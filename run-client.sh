@@ -9,6 +9,8 @@ MODE_SPARK="spark-client"
 
 CONFIG_FILE="config-client.yaml"
 
+OUTPUT_DIR="hdfs://master:9000/usr/ubuntu/$(yq ."training.model_type" "$CONFIG_FILE")_client_$(date +%Y%m%d_%H%M%S)"
+
 # --- Load Spark parameters from config-client.yaml ---
 if command -v yq >/dev/null 2>&1; then
     SPARK_MASTER=$(yq ."$MODE_SPARK.master" "$CONFIG_FILE")

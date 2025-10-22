@@ -29,11 +29,11 @@ project_name: Multi_Model_NIDS_Training
 
 # Training process settings
 training:
-  model_type: gru
+  model_type: rnn
   epochs: 100
   batch_size: 1024
   num_processes: 12  # Number of parallel processes for data loading | Equal to num_executors
-  learning_rate: 0.0001
+  learning_rate: 0.001
 
 # Spark configuration
 spark:

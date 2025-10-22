@@ -26,8 +26,11 @@ from sklearn.metrics import classification_report, confusion_matrix
 from project.utils.logger import setup_logger
 
 
-# Initialize logger for the driver
-driver_log_file = "/tmp/driver.log"
+# Initialize logger for the unique name for driver
+driver_log_file = os.path.join(
+    tempfile.gettempdir(),
+    f"driver_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log",
+)
 logger = setup_logger(rank="DRIVER", log_file=driver_log_file)
 
 def main():
