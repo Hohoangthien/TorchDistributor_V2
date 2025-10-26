@@ -28,7 +28,7 @@ project_name: Multi_Model_NIDS_Training
 
 # Training process settings
 training:
-  model_type: gru
+  model_type: transformer
   epochs: 35
   batch_size: 1024
   num_processes: 1  # Number of parallel processes for data loading | Equal to num_executors

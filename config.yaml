@@ -29,7 +29,7 @@ project_name: Multi_Model_NIDS_Training
 
 # Training process settings
 training:
-  model_type: rnn
+  model_type: lstm
   epochs: 100
   batch_size: 1024
   num_processes: 12  # Number of parallel processes for data loading | Equal to num_executors

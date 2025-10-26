@@ -102,11 +102,8 @@ def main():
         train_temp_dir,
     )
 
-    # If an output directory is provided via CLI, use it directly.
-    # Otherwise, construct it from the config and a timestamp.
     if cli_args.output_dir:
         final_output_dir = cli_args.output_dir
-        # Ensure the timestamp is appended if not already present for uniqueness
         if not any(char.isdigit() for char in os.path.basename(final_output_dir)):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             final_output_dir = f"{final_output_dir}_{model_type}_{timestamp}"
@@ -128,7 +125,7 @@ def main():
     distributor_args["steps_per_epoch"] = steps_per_epoch
 
     # Show prepared configuration
-    logger.info("\n[ƯPrepared Configuration for Training:")
+    logger.info("\n[Prepared Configuration for Training:")
     for key, value in distributor_args.items():
         if key not in ["files_per_worker", "samples_per_worker"]:
             logger.info(f"  {key}: {value}")

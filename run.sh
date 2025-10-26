@@ -1,26 +1,43 @@
 #!/bin/bash
 
-ALLUXIO_CLIENT_JAR="/usr/local/alluxio/client/alluxio-2.9.4-client.jar"
-# --- Application Configuration ---
-MODE_SPARK="spark-cluster3"
+
+# --- Configuration ---
+MODE=$1  # "client" or "cluster"
 
 CONFIG_FILE="config.yaml"
+MODE_SPARK="spark-cluster3" 
+ALLUXIO_CLIENT_JAR="/usr/local/alluxio/client/alluxio-2.9.4-client.jar"
 
+if [ "$MODE" == "cluster" ]; then
+  MODE_SPARK="spark-cluster3"
+elif [ "$MODE" == "client" ]; then
+  MODE_SPARK="spark-client"
+else
+  echo "Error: Invalid mode specified. Use 'client' or 'cluster'."
+  exit 1
+fi
+
+# --- Dynamic Output Directory ---
+MODEL_TYPE=$(yq ."training.model_type" "$CONFIG_FILE")
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+OUTPUT_DIR="hdfs://master:9000/usr/ubuntu/${MODEL_TYPE}_${MODE_SPARK}_${TIMESTAMP}"
+
+echo "===================================================================="
+echo "Starting Spark Cluster Job"
+echo "Config File:      $CONFIG_FILE"
+echo "Model Type:       $MODEL_TYPE"
+echo "Generated HDFS Output Dir: $OUTPUT_DIR"
+echo "===================================================================="
 
 # --- Load Spark parameters from config.yaml ---
-if command -v yq >/dev/null 2>&1; then
-    SPARK_MASTER=$(yq ."$MODE_SPARK.master" "$CONFIG_FILE")
-    DEPLOY_MODE=$(yq ."$MODE_SPARK.deploy_mode" "$CONFIG_FILE")
-    NUM_EXECUTORS=$(yq ."$MODE_SPARK.num_executors" "$CONFIG_FILE")
-    EXECUTOR_MEMORY=$(yq ."$MODE_SPARK.executor_memory" "$CONFIG_FILE")
-    EXECUTOR_CORES=$(yq ."$MODE_SPARK.executor_cores" "$CONFIG_FILE")
-    DRIVER_MEMORY=$(yq ."$MODE_SPARK.driver_memory" "$CONFIG_FILE")
-    EXECUTOR_MEMORY_OVERHEAD=$(yq ."$MODE_SPARK.executor_memory_overhead" "$CONFIG_FILE")
-    PYSPARK_PYTHON_PATH=$(yq ."$MODE_SPARK.python_env" "$CONFIG_FILE")
-else
-    echo "yq is required to parse config.yaml. Please install yq."
-    exit 1
-fi
+SPARK_MASTER=$(yq ."$MODE_SPARK.master" "$CONFIG_FILE")
+DEPLOY_MODE=$(yq ."$MODE_SPARK.deploy_mode" "$CONFIG_FILE")
+NUM_EXECUTORS=$(yq ."$MODE_SPARK.num_executors" "$CONFIG_FILE")
+EXECUTOR_MEMORY=$(yq ."$MODE_SPARK.executor_memory" "$CONFIG_FILE")
+EXECUTOR_CORES=$(yq ."$MODE_SPARK.executor_cores" "$CONFIG_FILE")
+DRIVER_MEMORY=$(yq ."$MODE_SPARK.driver_memory" "$CONFIG_FILE")
+EXECUTOR_MEMORY_OVERHEAD=$(yq ."$MODE_SPARK.executor_memory_overhead" "$CONFIG_FILE")
+PYSPARK_PYTHON_PATH=$(yq ."$MODE_SPARK.python_env" "$CONFIG_FILE")
 
 # --- Dynamic JAR loading logic ---
 SPARK_JARS_CONF=""
@@ -31,7 +48,6 @@ if grep -q "alluxio://" "$CONFIG_FILE"; then
     echo "Please update the ALLUXIO_CLIENT_JAR variable in this script."
     exit 1
   fi
-  # Construct the spark-submit options for Alluxio
   SPARK_JARS_CONF="--jars ${ALLUXIO_CLIENT_JAR} --conf spark.driver.extraClassPath=${ALLUXIO_CLIENT_JAR} --conf spark.executor.extraClassPath=${ALLUXIO_CLIENT_JAR}"
   echo "Alluxio JARs configured."
 else
@@ -42,8 +58,7 @@ fi
 echo "Packaging project files into project-cluster.zip..."
 zip -r project-cluster.zip project/ -x "*__pycache__*" "*.pyc"
 
-# --- Main execution command ---
-echo "Submitting Spark job..."
+echo "Submitting Spark job in cluster mode..."
 spark-submit \
 --master ${SPARK_MASTER} \
 --deploy-mode ${DEPLOY_MODE} \
@@ -57,12 +72,22 @@ spark-submit \
 ${SPARK_JARS_CONF} \
 --conf spark.pyspark.python=${PYSPARK_PYTHON_PATH} \
 --conf spark.pyspark.driver.python=${PYSPARK_PYTHON_PATH} \
-project/main.py --config ${CONFIG_FILE}
+project/main.py --config ${CONFIG_FILE} --output_dir "${OUTPUT_DIR}"
 
-# --- Cleanup ---
 EXIT_CODE=$?
-echo "Cleaning up packaged file..."
+
+# --- Post-processing and Cleanup ---
+echo "Spark job finished with exit code: $EXIT_CODE"
 rm project-cluster.zip
 
-echo "Spark job finished with exit code: $EXIT_CODE"
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "Training job successful."    
+    echo "Listing final contents of the output directory in HDFS:"
+    hdfs dfs -ls -R "${OUTPUT_DIR}"
+    hdfs dfs -get "${OUTPUT_DIR}" saves/cluster/
+
+else
+    echo "Training job failed. Check the logs for details."
+fi
+
 exit $EXIT_CODE

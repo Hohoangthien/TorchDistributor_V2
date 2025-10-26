@@ -4,7 +4,7 @@
 # It constructs the output directory path dynamically and passes it to the main script.
 
 # --- Configuration ---
-CONFIG_FILE="config.yaml"
+CONFIG_FILE="config-client.yaml"
 MODE_SPARK="spark-client" # Using the client-specific spark configuration
 ALLUXIO_CLIENT_JAR="/usr/local/alluxio/client/alluxio-2.9.4-client.jar"
 
@@ -86,6 +86,8 @@ if [ $EXIT_CODE -eq 0 ]; then
     echo "Training job successful."    
     echo "Listing final contents of the output directory in HDFS:"
     hdfs dfs -ls -R "${OUTPUT_DIR}"
+    hdfs dfs -get "${OUTPUT_DIR}" saves/client/
+
 else
     echo "Training job failed. Check the logs for details."
 fi
