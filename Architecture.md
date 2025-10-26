@@ -10,9 +10,61 @@ Hệ thống được thiết kế để hoạt động trên một cụm hạ t
 - **Quản lý tài nguyên**: YARN (Yet Another Resource Negotiator).
 - **Huấn luyện phân tán**: `TorchDistributor` của Spark, giúp triển khai PyTorch DDP (DistributedDataParallel).
 
-## 2. Kiến trúc tổng thể
+## 2. Kiến trúc Hạ tầng Cụ thể
 
-Kiến trúc hệ thống bao gồm sự kết hợp chặt chẽ giữa Spark và PyTorch, được điều phối bởi YARN. Spark không trực tiếp tham gia vào việc tính toán gradient mà đóng vai trò "dàn nhạc trưởng", khởi tạo và quản lý môi trường huấn luyện phân tán cho PyTorch.
+Dựa trên các file cấu hình, kiến trúc hạ tầng của cụm được thiết lập như sau:
+
+### 2.1. Cấu hình Cụm (Cluster Hardware)
+
+| Node Type | Số lượng | CPU  | RAM   | ROM   | Vai trò chính                                   |
+|-----------|----------|------|-------|-------|-------------------------------------------------|
+| Master    | 1        | 8    | 32 GB | 100 GB| Điều phối (Coordination)                        |
+| Worker    | 3        | 16   | 256 GB| 200 GB| Thực thi tác vụ (Execution)                     |
+| **Tổng cộng** | **4**    | **56** | **800 GB**| **700 GB**|                                                 |
+
+### 2.2. Phân bổ Vai trò (Service Allocation)
+
+- **Master Node (`master`)**: Chạy các tiến trình quản lý, điều phối và không thực thi tác vụ tính toán của người dùng.
+    - HDFS NameNode
+    - YARN ResourceManager
+    - Alluxio Master
+    - Spark History Server
+
+- **Worker Nodes (`worker1`, `worker2`, `worker3`)**: Chạy các tiến trình thực thi và lưu trữ dữ liệu.
+    - HDFS DataNode
+    - YARN NodeManager
+    - Alluxio Worker
+    - Spark Executor (bên trong các YARN container)
+
+### 2.3. Kiến trúc Hadoop (YARN & HDFS)
+
+- **HDFS**: Được cấu hình với `dfs.replication` là `2`, nghĩa là mỗi khối dữ liệu sẽ được lưu trên 2 Worker Node khác nhau để đảm bảo tính sẵn sàng.
+- **YARN**: Cấu hình trong `yarn-site.xml` rất quan trọng:
+    - `yarn.resourcemanager.hostname` được đặt là `master`, chỉ định master node chạy ResourceManager.
+    - Trên master, `yarn.nodemanager.resource.memory-mb` và `cpu-vcores` được đặt thành `0`. **Điều này ngăn YARN cấp phát bất kỳ container nào trên master node**, dành riêng nó cho việc điều phối.
+    - Tài nguyên tối đa cho một container (`maximum-allocation`) được đặt là 256GB RAM và 16 vcores, khớp với tài nguyên của một Worker Node.
+
+### 2.4. Kiến trúc Alluxio
+
+- Alluxio Master chạy trên `master` node.
+- Alluxio Worker chạy trên cả 3 `worker` node.
+- `alluxio.underfs.address` được trỏ tới `hdfs://master:9000`, xác nhận HDFS là hệ thống lưu trữ bền vững bên dưới.
+- Mỗi Alluxio Worker được cấp `80GB` bộ nhớ (`alluxio.worker.memory.size`) để làm cache. Dữ liệu được cache trên `ramdisk` (`/mnt/ramdisk`), đảm bảo tốc độ truy xuất nhanh nhất có thể.
+- `alluxio.user.file.readtype.default` là `CACHE`, nghĩa là các tác vụ đọc sẽ ưu tiên đọc dữ liệu từ cache của Alluxio.
+
+### 2.5. Kiến trúc và Cấu hình Spark
+
+- **Chế độ chạy**: Spark được cấu hình để chạy trên YARN (`spark.master: yarn`) ở chế độ `cluster` (`spark.submit.deployMode: cluster`). Điều này có nghĩa là Spark Driver cũng sẽ chạy trên một container ở một trong các Worker Node.
+- **Cấu hình Executor**: `spark-defaults.conf` được tối ưu để tận dụng tối đa tài nguyên:
+    - `spark.executor.cores`: `16`
+    - `spark.executor.memory`: `120g`
+    - `spark.executor.memoryOverhead`: `30g`
+    - Cấu hình này cho thấy ý đồ khởi chạy **một Executor lớn duy nhất trên mỗi Worker Node**. Executor này chiếm toàn bộ 16 CPU cores và tổng cộng 150GB bộ nhớ, giúp một job có thể tận dụng toàn bộ sức mạnh của một máy, giảm thiểu xung đột tài nguyên và độ trễ giao tiếp nội bộ.
+- **Tích hợp Alluxio**: `spark.driver.extraClassPath` và `spark.executor.extraClassPath` được cấu hình để trỏ đến Alluxio client JAR, cho phép Spark đọc và ghi dữ liệu trực tiếp qua Alluxio.
+
+## 3. Kiến trúc Ứng dụng Tổng thể
+
+Kiến trúc ứng dụng bao gồm sự kết hợp chặt chẽ giữa Spark và PyTorch, được điều phối bởi YARN trên nền hạ tầng đã mô tả ở trên.
 
 ```
 +--------------------------------------------------------------------------+
@@ -55,20 +107,20 @@ Kiến trúc hệ thống bao gồm sự kết hợp chặt chẽ giữa Spark v
 **Luồng hoạt động chính**:
 1.  Người dùng thực thi script `run.sh` (cho chế độ cluster) hoặc `run-client.sh` (cho chế độ client) trên một node biên.
 2.  `spark-submit` gửi yêu cầu đến YARN để khởi chạy ứng dụng Spark. `project.zip` và `config.yaml` được gửi kèm.
-3.  YARN cấp phát tài nguyên và khởi chạy Spark Driver. Spark Driver sau đó yêu cầu các Spark Executor.
+3.  YARN cấp phát tài nguyên và khởi chạy Spark Driver trong một container trên một Worker Node. Spark Driver sau đó yêu cầu các Spark Executor (trong trường hợp này là 3 executor, mỗi executor trên một worker node).
 4.  Trên mỗi Executor, `TorchDistributor` sẽ thiết lập môi trường huấn luyện PyTorch phân tán (DDP). Mỗi executor sẽ chạy một process training, thực thi logic trong `distributed_trainer.py`.
 5.  Các process training cùng nhau đọc dữ liệu từ **Alluxio** (nếu có) hoặc **HDFS**, thực hiện huấn luyện song song, và đồng bộ gradient sau mỗi batch.
 6.  Kết quả (model đã huấn luyện, logs, metrics) được ghi lại vào **HDFS**.
 7.  Sau khi hoàn tất, các thư mục tạm trên Alluxio/HDFS sẽ được dọn dẹp.
 
-## 3. Hướng dẫn sử dụng
+## 4. Hướng dẫn sử dụng
 
-### 3.1. Yêu cầu
+### 4.1. Yêu cầu
 - Môi trường Hadoop/Spark đã được cài đặt và cấu hình.
 - Python và các thư viện trong `requirements.txt`. Cài đặt bằng lệnh: `pip install -r requirements.txt`.
 - `yq` (command-line YAML processor) để đọc file cấu hình. Cài đặt trên Ubuntu: `sudo snap install yq`.
 
-### 3.2. Cấu hình (`config.yaml`, `config-client.yaml`)
+### 4.2. Cấu hình (`config.yaml`, `config-client.yaml`)
 - **`config.yaml`**: File cấu hình chính cho môi trường sản xuất (chạy trên cluster).
 - **`config-client.yaml`**: File cấu hình cho môi trường phát triển (chạy ở chế độ client), thường có cấu hình tài nguyên thấp hơn.
 
@@ -92,7 +144,7 @@ Các mục chính trong file cấu hình:
     - `default`: Các siêu tham số kiến trúc mặc định.
     - Các mục con (`lstm`, `gru`, ...): Ghi đè tham số mặc định cho từng loại model cụ thể.
 
-### 3.3. Thực thi
+### 4.3. Thực thi
 1.  **Chỉnh sửa `run.sh` / `run-client.sh`**:
     - Cập nhật biến `ALLUXIO_CLIENT_JAR` trỏ đến file JAR client của Alluxio trên máy của bạn.
     - (Tùy chọn) Thay đổi `MODE_SPARK` để chọn profile Spark mong muốn từ `config.yaml`.
@@ -107,7 +159,7 @@ Các mục chính trong file cấu hình:
     - Gọi `spark-submit` với đầy đủ các cấu hình.
     - Xóa `project.zip` sau khi hoàn tất.
 
-## 4. Cấu trúc thư mục và giải thích mã nguồn
+## 5. Cấu trúc thư mục và giải thích mã nguồn
 
 - **`run.sh`**: Entrypoint để chạy ứng dụng ở chế độ `cluster` trên YARN.
 - **`run-client.sh`**: Entrypoint để chạy ứng dụng ở chế độ `client`, thuận tiện cho việc gỡ lỗi.
