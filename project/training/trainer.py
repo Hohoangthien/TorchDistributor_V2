@@ -7,6 +7,7 @@ from datetime import timedelta
 import time
 import itertools
 import logging
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from project.utils.logger import setup_logger
 from project.models import create_model
@@ -73,6 +74,20 @@ def training_function(args_dict):
         optimizer = optim.AdamW(
             model.parameters(), lr=args_dict.get("learning_rate", 0.002)
         )
+        
+        scheduler = None
+        scheduler_config = args_dict.get("training", {}).get("scheduler", {})
+        if scheduler_config.get("enabled", False) and rank == 0:
+            logger.info("Learning rate scheduler (ReduceLROnPlateau) is enabled.")
+            scheduler = ReduceLROnPlateau(
+                optimizer,
+                mode='min',
+                factor=scheduler_config.get("factor", 0.1),
+                patience=scheduler_config.get("patience", 3),
+                min_lr=scheduler_config.get("min_lr", 1e-6),
+                verbose=True
+            )
+
         criterion = nn.CrossEntropyLoss(reduction="none")
         eval_criterion = nn.CrossEntropyLoss()
 
@@ -122,6 +137,9 @@ def training_function(args_dict):
                 history["val_accuracies"].append(val_acc)
                 history["train_losses"].append(0)  # Placeholder
                 history["train_accuracies"].append(0)  # Placeholder
+
+                if scheduler:
+                    scheduler.step(val_loss)
 
                 if val_acc > best_val_acc:
                     best_val_acc = val_acc
