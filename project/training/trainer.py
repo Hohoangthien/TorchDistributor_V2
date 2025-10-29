@@ -76,7 +76,9 @@ def training_function(args_dict):
         )
         
         scheduler = None
-        scheduler_config = args_dict.get("training", {}).get("scheduler", {})
+        scheduler_config = args_dict.get("scheduler", {1: 1})
+        
+        # logger.info(f"Scheduler Config: {scheduler_config}")
         if scheduler_config.get("enabled", False) and rank == 0:
             logger.info("Learning rate scheduler (ReduceLROnPlateau) is enabled.")
             scheduler = ReduceLROnPlateau(
@@ -85,14 +87,13 @@ def training_function(args_dict):
                 factor=scheduler_config.get("factor", 0.1),
                 patience=scheduler_config.get("patience", 3),
                 min_lr=scheduler_config.get("min_lr", 1e-6),
-                verbose=True
             )
 
         criterion = nn.CrossEntropyLoss(reduction="none")
         eval_criterion = nn.CrossEntropyLoss()
 
         # --- Training Loop ---
-        logger.info(f"Starting training for {model_type.upper()} model...")
+        logger.info(f"Starting training for {model_type.upper()} model... \n | World Size: {world_size} | Learning Rate: {args_dict.get('learning_rate', 0.002)} \n | ReduceLROnPlateau: {scheduler is not None} | Batch Size: {batch_size}")
         best_val_acc = 0.0
         history = {
             "train_losses": [],
@@ -102,7 +103,7 @@ def training_function(args_dict):
         }
 
         for epoch in range(max_epochs):
-            logger.info(f"Starting Epoch {epoch + 1}/{max_epochs}")
+            logger.info(f"Starting Epoch {epoch + 1}/{max_epochs} | LR: {optimizer.param_groups[0]['lr']:.6f}")
             model.train()
             for i, (features, labels, weights) in enumerate(
                 itertools.islice(train_dataloader, steps_per_epoch)
@@ -137,9 +138,15 @@ def training_function(args_dict):
                 history["val_accuracies"].append(val_acc)
                 history["train_losses"].append(0)  # Placeholder
                 history["train_accuracies"].append(0)  # Placeholder
+                
 
                 if scheduler:
+                    old_lr = optimizer.param_groups[0]['lr']
                     scheduler.step(val_loss)
+                    
+                    new_lr = optimizer.param_groups[0]['lr']
+                    if new_lr != old_lr:
+                        logger.info(f"Learning rate reduced from {old_lr:.6f} to {new_lr:.6f} due to plateau in validation loss.")
 
                 if val_acc > best_val_acc:
                     best_val_acc = val_acc

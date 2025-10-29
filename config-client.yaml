@@ -28,11 +28,16 @@ project_name: Multi_Model_NIDS_Training
 
 # Training process settings
 training:
-  model_type: transformer
-  epochs: 35
+  model_type: rnn
+  epochs: 100
   batch_size: 1024
   num_processes: 1  # Number of parallel processes for data loading | Equal to num_executors
   learning_rate: 0.001
+  scheduler:
+    enabled: true
+    patience: 5
+    factor: 0.1
+    min_lr: 1.0e-05
 
 # Spark configuration
 spark:

@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 
-# ✅ BASIC ENVIRONMENT (same)
+#  BASIC ENVIRONMENT (same)
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 export HADOOP_CONF_DIR=/usr/local/hadoop/etc/hadoop
 export SPARK_DIST_CLASSPATH=$(/usr/local/hadoop/bin/hadoop classpath)
 
-# ✅ NETWORK CONFIGURATION (same)
+# NETWORK CONFIGURATION (same)
 export SPARK_MASTER_HOST=master
 export SPARK_LOCAL_IP=$(hostname -i)
 
-# ✅ PYTHON ENVIRONMENT (same)
+# PYTHON ENVIRONMENT (same)
 export PYSPARK_PYTHON=python3
 export PYSPARK_DRIVER_PYTHON=python3
 
-# ❌ MASTER SPECIFIC: No local workers
+# MASTER SPECIFIC: No local workers
 export SPARK_DAEMON_MEMORY=2g        # More memory for coordination
 export SPARK_WORKER_INSTANCES=0      # No workers on master
 export SPARK_WORKER_MEMORY=0         # No worker memory on master
 export SPARK_WORKER_CORES=0          # No worker cores on master
 
-# ✅ JVM OPTIONS (same logic)
+# JVM OPTIONS (same logic)
 export SPARK_DAEMON_JAVA_OPTS="-Djava.net.preferIPv4Stack=true -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=4 -XX:ConcGCThreads=2 -XX:InitiatingHeapOccupancyPercent=35"
 
 export SPARK_DRIVER_JAVA_OPTS="-Djava.net.preferIPv4Stack=true -XX:+UseG1GC -XX:+UnlockDiagnosticVMOptions -XX:G1HeapRegionSize=16m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/spark-driver-heap.hprof"
