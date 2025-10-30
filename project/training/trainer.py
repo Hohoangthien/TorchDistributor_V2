@@ -93,7 +93,7 @@ def training_function(args_dict):
         eval_criterion = nn.CrossEntropyLoss()
 
         # --- Training Loop ---
-        logger.info(f"Starting training for {model_type.upper()} model... \n | World Size: {world_size} | Learning Rate: {args_dict.get('learning_rate', 0.002)} \n | ReduceLROnPlateau: {scheduler is not None} | Batch Size: {batch_size}")
+        logger.info(f"Starting training for {model_type.upper()} model... | World Size: {world_size} | Learning Rate: {args_dict.get('learning_rate', 0.002)} | ReduceLROnPlateau: {scheduler is not None} | Batch Size: {batch_size}")
         best_val_acc = 0.0
         history = {
             "train_losses": [],
