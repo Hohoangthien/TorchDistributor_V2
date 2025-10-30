@@ -8,7 +8,7 @@
 
 ## **1. Tổng quan**
 
-Dự án này là một pipeline hoàn chỉnh, mạnh mẽ và có khả năng mở rộng để huấn luyện các mô hình học sâu (tập trung vào các kiến trúc dựa trên RNN) một cách phân tán trên một cụm Big Data (Hadoop/Spark/YARN).
+Dự án này là một pipeline hoàn chỉnh và có khả năng mở rộng để huấn luyện các mô hình học sâu (tập trung vào các kiến trúc dựa trên RNN) một cách phân tán trên một cụm Big Data (Hadoop/Spark/YARN).
 
 Pipeline được thiết kế theo dạng module hóa, điều khiển bởi cấu hình, và sử dụng kiến trúc nạp dữ liệu kiểu streaming kết hợp với lớp cache Alluxio để xử lý các tập dữ liệu cực lớn một cách hiệu quả.
 
@@ -29,9 +29,9 @@ Dự án được tổ chức theo cấu trúc giúp dễ dàng quản lý và m
 
 ```
 TorchDistributor_V1
-├─ Architecture.md
-├─ README.md
-├─ conf
+├─ Architecture.md                  # Tài liệu chi tiết về kiến trúc hệ thống
+├─ README.md                        # Tài liệu tổng quan dự án
+├─ conf                             # Chứa file cấu hình của các dịch vụ hạ tầng (Hadoop, Spark, Alluxio)
 │  ├─ alluxio
 │  │  ├─ alluxio-site.properties
 │  │  ├─ masters
@@ -52,36 +52,36 @@ TorchDistributor_V1
 │     └─ workers
 ├─ config-client.yaml
 ├─ config.yaml
-├─ data_prepare
+├─ data_prepare                     # Chứa notebook để khám phá và tiền xử lý dữ liệu
 │  └─ nf-uq-nids-v2-preprocess-add-class-weight-spark.ipynb
-├─ main.py
-├─ project
-│  ├─ data
+├─ main.py                          # Trình khởi chạy đơn giản (wrapper)
+├─ project                          # Mã nguồn chính của ứng dụng Spark
+│  ├─ data                          # Module xử lý dữ liệu (loader, preprocessor)
 │  │  ├─ data_loader.py
 │  │  ├─ data_preprocessor.py
 │  │  ├─ preprocess.IPYNB
 │  │  └─ spark_utils.py
 │  ├─ main.py
-│  ├─ models
+│  ├─ models                        # Module chứa các kiến trúc mô hình    
 │  │  ├─ __init__.py
 │  │  ├─ base_model.py
 │  │  ├─ gru_model.py
 │  │  ├─ lstm_model.py
 │  │  ├─ rnn_model.py
 │  │  └─ transformer_model.py
-│  ├─ training
+│  ├─ training                      # Module chứa logic huấn luyện và đánh giá
 │  │  ├─ __init__.py
 │  │  ├─ distributed_trainer.py
 │  │  ├─ evaluator.py
 │  │  └─ trainer.py
-│  └─ utils
+│  └─ utils                         # Các hàm tiện ích (config, hdfs, logging, visualization)
 │     ├─ __init__.py
 │     ├─ config.py
 │     ├─ hdfs_utils.py
 │     ├─ logger.py
 │     └─ visualization.py
 ├─ requirements.txt
-├─ run-client.sh
+├─ run-client.sh                    # Script để chạy pipeline ở chế độ CLIENT/CLUSTER
 └─ run.sh
 
 ```
