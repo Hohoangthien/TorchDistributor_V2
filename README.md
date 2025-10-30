@@ -28,22 +28,62 @@ Pipeline được thiết kế theo dạng module hóa, điều khiển bởi c�
 Dự án được tổ chức theo cấu trúc giúp dễ dàng quản lý và mở rộng:
 
 ```
-/
-├── conf/                     # Chứa file cấu hình của các dịch vụ hạ tầng (Hadoop, Spark, Alluxio)
-├── data_prepare/             # Chứa notebook để khám phá và tiền xử lý dữ liệu
-├── project/                  # Mã nguồn chính của ứng dụng Spark
-│   ├── data/                 # Module xử lý dữ liệu (loader, preprocessor)
-│   ├── models/               # Module chứa các kiến trúc mô hình
-│   ├── training/             # Module chứa logic huấn luyện và đánh giá
-│   └── utils/                # Các hàm tiện ích (config, hdfs, logging, visualization)
-├── config.yaml               # Tệp cấu hình chính cho chế độ CLUSTER
-├── config-client.yaml        # Tệp cấu hình cho chế độ CLIENT (dev/debug)
-├── main.py                   # Trình khởi chạy đơn giản (wrapper)
-├── Architecture.md           # Tài liệu chi tiết về kiến trúc hệ thống
-├── README.md                 # Tài liệu tổng quan dự án
-├── requirements.txt          # Danh sách các gói phụ thuộc Python
-├── run.sh                    # Script để chạy pipeline ở chế độ CLUSTER
-└── run-client.sh             # Script để chạy pipeline ở chế độ CLIENT
+TorchDistributor_V1
+├─ Architecture.md
+├─ README.md
+├─ conf
+│  ├─ alluxio
+│  │  ├─ alluxio-site.properties
+│  │  ├─ masters
+│  │  └─ workers
+│  ├─ hadoop
+│  │  ├─ core-site.xml
+│  │  ├─ hadoop-env.sh
+│  │  ├─ hdfs-site.xml
+│  │  ├─ httpfs-log4j.properties
+│  │  ├─ mapred-site.xml
+│  │  ├─ workers
+│  │  └─ yarn-site.xml
+│  └─ spark
+│     ├─ spark-defaults.conf
+│     ├─ spark-env.sh
+│     ├─ spark-env.sh.template
+│     ├─ spark-env.sh.worker
+│     └─ workers
+├─ config-client.yaml
+├─ config.yaml
+├─ data_prepare
+│  └─ nf-uq-nids-v2-preprocess-add-class-weight-spark.ipynb
+├─ main.py
+├─ project
+│  ├─ data
+│  │  ├─ data_loader.py
+│  │  ├─ data_preprocessor.py
+│  │  ├─ preprocess.IPYNB
+│  │  └─ spark_utils.py
+│  ├─ main.py
+│  ├─ models
+│  │  ├─ __init__.py
+│  │  ├─ base_model.py
+│  │  ├─ gru_model.py
+│  │  ├─ lstm_model.py
+│  │  ├─ rnn_model.py
+│  │  └─ transformer_model.py
+│  ├─ training
+│  │  ├─ __init__.py
+│  │  ├─ distributed_trainer.py
+│  │  ├─ evaluator.py
+│  │  └─ trainer.py
+│  └─ utils
+│     ├─ __init__.py
+│     ├─ config.py
+│     ├─ hdfs_utils.py
+│     ├─ logger.py
+│     └─ visualization.py
+├─ requirements.txt
+├─ run-client.sh
+└─ run.sh
+
 ```
 
 ## **3. Cài đặt và Thiết lập**
