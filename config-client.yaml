@@ -24,7 +24,7 @@ artifact_storage:
   output_dir: "hdfs://master:9000/usr/ubuntu/client-results-ultra"
 
 # General project settings
-project_name: Multi_Model_NIDS_Training
+project_name: Client_Multi_Model_NIDS_Training
 
 # Training process settings
 training:
@@ -69,13 +69,13 @@ model_params:
 
   lstm:
     hidden_size: 256
-    num_layers: 4
-    dropout: 0.3
+    num_layers: 3
+    dropout: 0.15
 
   gru:
     hidden_size: 128
     num_layers: 3
-    dropout: 0.2
+    dropout: 0.15
 
   rnn:
     hidden_size: 64

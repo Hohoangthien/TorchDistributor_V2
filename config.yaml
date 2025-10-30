@@ -36,7 +36,7 @@ training:
   learning_rate: 0.001
   scheduler:
     enabled: true
-    patience: 3
+    patience: 5
     factor: 0.1
     min_lr: 1.0e-05
 
@@ -45,10 +45,10 @@ spark:
   master: yarn
   deploy_mode: cluster
   executor_memory: 32G
-  executor_cores: 4 
+  executor_cores: 4
   num_executors: 12
   executor_memory_overhead: 4G
-  driver_memory: 4G
+  driver_memory: 10G
   python_env: /home/ubuntu/spark_env/bin/python
 
 spark-cluster2:
@@ -90,13 +90,13 @@ model_params:
 
   lstm:
     hidden_size: 256
-    num_layers: 4
-    dropout: 0.3
+    num_layers: 3
+    dropout: 0.15
 
   gru:
     hidden_size: 128
     num_layers: 3
-    dropout: 0.2
+    dropout: 0.15
 
   rnn:
     hidden_size: 64
