@@ -14,10 +14,7 @@ def vector_to_list(v: Vector) -> list:
 vector_to_array_udf = udf(vector_to_list, ArrayType(DoubleType()))
 
 def prepare_data_partitions(spark, data_path, num_processes, output_temp_dir):
-    """
-    Prepares data by repartitioning and saving it to a temporary Parquet location.
-    It standardizes the feature vector into a simple array format.
-    """
+
     print(
         f"[DRIVER] Preparing data from {data_path} into {num_processes} partitions -> {output_temp_dir}"
     )

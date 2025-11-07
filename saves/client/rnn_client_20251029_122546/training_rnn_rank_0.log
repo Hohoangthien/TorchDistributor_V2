@@ -1,0 +1,86 @@
+[2025-10-29 11:46:31][RANK 0][INFO] Initializing Dataloaders...
+[2025-10-29 11:46:31][RANK 0][INFO] Dataloaders initialized.
+[2025-10-29 11:46:33][RANK 0][INFO] Scheduler Config: {}
+[2025-10-29 11:46:33][RANK 0][INFO] Starting training for RNN model... 
+ | World Size: 1 | Learning Rate: 0.001 
+ | ReduceLROnPlateau: False | Batch Size: 1024
+[2025-10-29 11:46:33][RANK 0][INFO] Starting Epoch 1/10
+[2025-10-29 11:46:33][RANK 0][INFO] Starting validation...
+[2025-10-29 11:54:18][RANK 0][INFO] EPOCH 1 SUMMARY: Val Loss: 2.7366 | Val Acc: 0.1149
+[2025-10-29 11:54:18][RANK 0][INFO] New best val_acc: 0.1149. Saving model...
+[2025-10-29 11:54:20][RANK 0][INFO] Starting Epoch 2/10
+[2025-10-29 11:54:20][RANK 0][INFO] Starting validation...
+[2025-10-29 12:01:24][RANK 0][ERROR] An unhandled exception occurred on RANK 0: unknown parameter type
+[2025-10-29 12:01:25][RANK 0][ERROR] Traceback (most recent call last):
+  File "/usr/local/hadoop/tmp/nm-local-dir/usercache/ubuntu/appcache/application_1760691761269_0025/container_1760691761269_0025_01_000002/project-client.zip/project/data/data_loader.py", line 62, in __iter__
+    torch.tensor(pydict["scaled_features"], dtype=torch.float32),
+TypeError: () takes 1 positional argument but 1 was given
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/hadoop/tmp/nm-local-dir/usercache/ubuntu/appcache/application_1760691761269_0025/container_1760691761269_0025_01_000002/project-client.zip/project/training/evaluator.py", line 18, in evaluate_loop
+    for features, labels, weights in dataloader:
+  File "/home/ubuntu/spark_env/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 630, in __next__
+    data = self._next_data()
+  File "/home/ubuntu/spark_env/lib/python3.10/site-packages/torch/utils/data/dataloader.py", line 673, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/home/ubuntu/spark_env/lib/python3.10/site-packages/torch/utils/data/_utils/fetch.py", line 42, in fetch
+    data = next(self.dataset_iter)
+  File "/usr/local/hadoop/tmp/nm-local-dir/usercache/ubuntu/appcache/application_1760691761269_0025/container_1760691761269_0025_01_000002/project-client.zip/project/data/data_loader.py", line 73, in __iter__
+    print(
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/local/hadoop/tmp/nm-local-dir/usercache/ubuntu/appcache/application_1760691761269_0025/container_1760691761269_0025_01_000002/project-client.zip/project/training/trainer.py", line 131, in training_function
+    val_loss, val_acc, _, _ = evaluate_loop(
+  File "/usr/local/hadoop/tmp/nm-local-dir/usercache/ubuntu/appcache/application_1760691761269_0025/container_1760691761269_0025_01_000002/project-client.zip/project/training/evaluator.py", line 17, in evaluate_loop
+    with torch.no_grad():
+  File "/home/ubuntu/spark_env/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 85, in __exit__
+    torch.set_grad_enabled(self.prev)
+  File "/home/ubuntu/spark_env/lib/python3.10/site-packages/torch/autograd/grad_mode.py", line 187, in __init__
+    torch._C._set_grad_enabled(mode)
+RuntimeError: unknown parameter type
+
+[2025-10-29 12:29:50][RANK 0][INFO] Initializing Dataloaders...
+[2025-10-29 12:29:50][RANK 0][INFO] Dataloaders initialized.
+[2025-10-29 12:29:51][RANK 0][INFO] Learning rate scheduler (ReduceLROnPlateau) is enabled.
+[2025-10-29 12:29:51][RANK 0][INFO] Starting training for RNN model... 
+ | World Size: 1 | Learning Rate: 0.001 
+ | ReduceLROnPlateau: True | Batch Size: 1024
+[2025-10-29 12:29:51][RANK 0][INFO] Starting Epoch 1/10 | LR: 0.001000
+[2025-10-29 12:29:51][RANK 0][INFO] Starting validation...
+[2025-10-29 12:37:26][RANK 0][INFO] EPOCH 1 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 12:37:26][RANK 0][INFO] New best val_acc: 0.0373. Saving model...
+[2025-10-29 12:37:28][RANK 0][INFO] Starting Epoch 2/10 | LR: 0.001000
+[2025-10-29 12:37:28][RANK 0][INFO] Starting validation...
+[2025-10-29 12:45:13][RANK 0][INFO] EPOCH 2 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 12:45:14][RANK 0][INFO] Starting Epoch 3/10 | LR: 0.001000
+[2025-10-29 12:45:14][RANK 0][INFO] Starting validation...
+[2025-10-29 12:52:59][RANK 0][INFO] EPOCH 3 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 12:52:59][RANK 0][INFO] Learning rate reduced from 0.001000 to 0.000100 due to plateau in validation loss.
+[2025-10-29 12:53:00][RANK 0][INFO] Starting Epoch 4/10 | LR: 0.000100
+[2025-10-29 12:53:00][RANK 0][INFO] Starting validation...
+[2025-10-29 13:00:48][RANK 0][INFO] EPOCH 4 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 13:00:49][RANK 0][INFO] Starting Epoch 5/10 | LR: 0.000100
+[2025-10-29 13:00:49][RANK 0][INFO] Starting validation...
+[2025-10-29 13:08:35][RANK 0][INFO] EPOCH 5 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 13:08:35][RANK 0][INFO] Learning rate reduced from 0.000100 to 0.000010 due to plateau in validation loss.
+[2025-10-29 13:08:36][RANK 0][INFO] Starting Epoch 6/10 | LR: 0.000010
+[2025-10-29 13:08:36][RANK 0][INFO] Starting validation...
+[2025-10-29 13:16:24][RANK 0][INFO] EPOCH 6 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 13:16:25][RANK 0][INFO] Starting Epoch 7/10 | LR: 0.000010
+[2025-10-29 13:16:25][RANK 0][INFO] Starting validation...
+[2025-10-29 13:24:10][RANK 0][INFO] EPOCH 7 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 13:24:11][RANK 0][INFO] Starting Epoch 8/10 | LR: 0.000010
+[2025-10-29 13:24:11][RANK 0][INFO] Starting validation...
+[2025-10-29 13:32:02][RANK 0][INFO] EPOCH 8 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 13:32:03][RANK 0][INFO] Starting Epoch 9/10 | LR: 0.000010
+[2025-10-29 13:32:03][RANK 0][INFO] Starting validation...
+[2025-10-29 13:39:59][RANK 0][INFO] EPOCH 9 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 13:40:00][RANK 0][INFO] Starting Epoch 10/10 | LR: 0.000010
+[2025-10-29 13:40:01][RANK 0][INFO] Starting validation...
+[2025-10-29 13:47:13][RANK 0][INFO] EPOCH 10 SUMMARY: Val Loss: 2.6979 | Val Acc: 0.0373
+[2025-10-29 13:47:14][RANK 0][INFO] Uploading model from /tmp/model_upload to hdfs://master:9000/usr/ubuntu/rnn_client_20251029_122546

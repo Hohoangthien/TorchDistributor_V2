@@ -1,0 +1,116 @@
+{
+  "Benign": {
+    "precision": 0.06099704541715834,
+    "recall": 0.012474427172640657,
+    "f1-score": 0.020712888253943677,
+    "support": 3775003.0
+  },
+  "DDoS": {
+    "precision": 0.05309042668813619,
+    "recall": 0.10452258353054836,
+    "f1-score": 0.07041485408449275,
+    "support": 3266739.0
+  },
+  "DoS": {
+    "precision": 0.06323915262078049,
+    "recall": 0.013351181629525585,
+    "f1-score": 0.022047623136830875,
+    "support": 2682609.0
+  },
+  "scanning": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 567124.0
+  },
+  "Reconnaissance": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 395007.0
+  },
+  "xss": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 368244.0
+  },
+  "password": {
+    "precision": 0.0012141969404528038,
+    "recall": 0.001223538102823372,
+    "f1-score": 0.0012188496244275862,
+    "support": 173268.0
+  },
+  "injection": {
+    "precision": 0.005245994612221749,
+    "recall": 0.0007168875455320468,
+    "f1-score": 0.0012613994715758971,
+    "support": 103224.0
+  },
+  "Bot": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 21343.0
+  },
+  "Brute Force": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 18687.0
+  },
+  "Infilteration": {
+    "precision": 3.421962153098587e-05,
+    "recall": 0.0001144950767117014,
+    "f1-score": 5.269120320362516e-05,
+    "support": 17468.0
+  },
+  "Exploits": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 4760.0
+  },
+  "Fuzzers": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 3332.0
+  },
+  "Backdoor": {
+    "precision": 0.00023752969121140142,
+    "recall": 0.0007069635913750442,
+    "f1-score": 0.00035558716330340474,
+    "support": 2829.0
+  },
+  "Generic": {
+    "precision": 0.00013223230493547355,
+    "recall": 0.1654501216545012,
+    "f1-score": 0.00026425341124922884,
+    "support": 2466.0
+  },
+  "mitm": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 1152.0
+  },
+  "accuracy": 0.03727470796715499,
+  "macro avg": {
+    "precision": 0.011511924868526716,
+    "recall": 0.018660012393978624,
+    "f1-score": 0.00727050914681419,
+    "support": 11403255.0
+  },
+  "weighted avg": {
+    "precision": 0.05034492402656989,
+    "recall": 0.03727470796715499,
+    "f1-score": 0.03224581840190442,
+    "support": 11403255.0
+  },
+  "model_info": {
+    "status": "SUCCESS",
+    "best_val_accuracy": 0.03734821880905137,
+    "test_accuracy": 0.03727470796715499
+  }
+}

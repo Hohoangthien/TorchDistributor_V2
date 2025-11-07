@@ -1,0 +1,31 @@
+[2025-10-24 00:24:18][RANK DRIVER][INFO] 
+Starting Multi_Model_NIDS_Training
+[2025-10-24 00:24:18][RANK DRIVER][INFO] Selected Model: RNN
+[2025-10-24 00:29:15][RANK DRIVER][INFO] 
+[Prepared Configuration for Training:
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   data_source_paths: {'base_path': 'alluxio://master:19998/usr/ubuntu/data/classweights-43-16', 'train_path': 'alluxio://master:19998/usr/ubuntu/data/classweights-43-16/train_df.parquet', 'test_path': 'alluxio://master:19998/usr/ubuntu/data/classweights-43-16/test_df.parquet', 'label_indexer_path': 'alluxio://master:19998/usr/ubuntu/data/classweights-43-16/data/label_indexer/label_indexer/label_indexer', 'temp_dir': 'alluxio://master:19998/tmp'}
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   artifact_storage_paths: {'output_dir': 'hdfs://master:9000/usr/ubuntu/rnn_spark-cluster3_20251024_002329'}
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   model_type: rnn
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   epochs: 100
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   batch_size: 1024
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   num_processes: 12
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   learning_rate: 0.001
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   hidden_size: 64
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   num_layers: 2
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   dropout: 0.15
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   num_classes: 16
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   class_names: ['Benign', 'DDoS', 'DoS', 'scanning', 'Reconnaissance', 'xss', 'password', 'injection', 'Bot', 'Brute Force', 'Infilteration', 'Exploits', 'Fuzzers', 'Backdoor', 'Generic', 'mitm']
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   num_features: 43
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   validation_file_path: alluxio://master:19998/tmp/val_data_rnn_20251024_002450/part-00000-8f57c3fe-a797-4bb5-9a71-2174590add48-c000.snappy.parquet
+[2025-10-24 00:29:15][RANK DRIVER][INFO]   steps_per_epoch: 4327
+[2025-10-25 00:36:08][RANK DRIVER][INFO] 
+RNN training completed successfully!
+[2025-10-25 00:36:08][RANK DRIVER][INFO] 
+Starting FINAL evaluation on TEST set...
+[2025-10-25 00:36:08][RANK DRIVER][INFO] Loading BEST model from artifact storage: hdfs://master:9000/usr/ubuntu/rnn_spark-cluster3_20251024_002329/best_rnn_model.pth
+[2025-10-25 00:36:11][RANK DRIVER][INFO] Model loaded successfully.
+[2025-10-25 00:37:57][RANK DRIVER][INFO] Waiting for 3 seconds to allow data to settle in Alluxio...
+[2025-10-25 00:46:18][RANK DRIVER][INFO] --- FINAL TEST SET PERFORMANCE (RNN) ---
+[2025-10-25 00:46:18][RANK DRIVER][INFO]   Test Accuracy: 0.9408
+[2025-10-25 00:46:43][RANK DRIVER][INFO] 
+Cleaning up temporary directories...

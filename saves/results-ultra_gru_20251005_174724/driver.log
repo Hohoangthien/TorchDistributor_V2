@@ -1,0 +1,14 @@
+[2025-10-05 17:47:00][RANK DRIVER][INFO] 
+Starting Multi_Model_NIDS_Training
+[2025-10-05 17:47:00][RANK DRIVER][INFO] Selected Model: GRU
+[2025-10-05 18:38:55][RANK DRIVER][INFO] 
+GRU training completed successfully!
+[2025-10-05 18:38:55][RANK DRIVER][INFO] 
+Starting FINAL evaluation on TEST set...
+[2025-10-05 18:38:55][RANK DRIVER][INFO] Loading BEST model from artifact storage: hdfs://master:9000/usr/ubuntu/results-ultra_gru_20251005_174724/best_gru_model.pth
+[2025-10-05 18:38:57][RANK DRIVER][INFO] Model loaded successfully.
+[2025-10-05 18:40:13][RANK DRIVER][INFO] Waiting for 3 seconds to allow data to settle in Alluxio...
+[2025-10-05 18:48:12][RANK DRIVER][INFO] --- FINAL TEST SET PERFORMANCE (GRU) ---
+[2025-10-05 18:48:12][RANK DRIVER][INFO]   Test Accuracy: 0.6518
+[2025-10-05 18:48:31][RANK DRIVER][INFO] 
+Cleaning up temporary directories...

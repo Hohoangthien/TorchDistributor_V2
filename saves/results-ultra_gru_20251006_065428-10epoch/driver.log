@@ -1,0 +1,31 @@
+[2025-10-06 06:54:02][RANK DRIVER][INFO] 
+Starting Multi_Model_NIDS_Training
+[2025-10-06 06:54:02][RANK DRIVER][INFO] Selected Model: GRU
+[2025-10-06 07:00:22][RANK DRIVER][INFO] 
+[ƯPrepared Configuration for Training:
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   data_source_paths: {'base_path': 'hdfs://master:9000/usr/ubuntu/data/classweights-43-21', 'train_path': 'hdfs://master:9000/usr/ubuntu/data/classweights-43-21/train_df.parquet', 'test_path': 'hdfs://master:9000/usr/ubuntu/data/classweights-43-21/test_df.parquet', 'label_indexer_path': 'hdfs://master:9000/usr/ubuntu/data/classweights-43-21/data/label_indexer/label_indexer', 'temp_dir': 'hdfs://master:9000/tmp'}
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   artifact_storage_paths: {'output_dir': 'hdfs://master:9000/usr/ubuntu/results-ultra_gru_20251006_065428'}
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   model_type: gru
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   epochs: 10
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   batch_size: 1024
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   num_processes: 12
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   learning_rate: 0.01
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   hidden_size: 128
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   num_layers: 3
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   dropout: 0.2
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   num_classes: 21
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   class_names: ['Benign', 'DDoS', 'DoS', 'scanning', 'Reconnaissance', 'xss', 'password', 'injection', 'Bot', 'Brute Force', 'Infilteration', 'Exploits', 'Fuzzers', 'Backdoor', 'Generic', 'mitm', 'ransomware', 'Theft', 'Analysis', 'Shellcode', 'Worms']
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   num_features: 39
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   validation_file_path: hdfs://master:9000/tmp/val_data_gru_20251006_065428/part-00000-f2bcefd8-4113-4c4a-b70a-fd902a397a0f-c000.snappy.parquet
+[2025-10-06 07:00:22][RANK DRIVER][INFO]   steps_per_epoch: 4328
+[2025-10-06 11:20:38][RANK DRIVER][INFO] 
+GRU training completed successfully!
+[2025-10-06 11:20:38][RANK DRIVER][INFO] 
+Starting FINAL evaluation on TEST set...
+[2025-10-06 11:20:38][RANK DRIVER][INFO] Loading BEST model from artifact storage: hdfs://master:9000/usr/ubuntu/results-ultra_gru_20251006_065428/best_gru_model.pth
+[2025-10-06 11:20:41][RANK DRIVER][INFO] Model loaded successfully.
+[2025-10-06 11:22:20][RANK DRIVER][INFO] Waiting for 3 seconds to allow data to settle in Alluxio...
+[2025-10-06 11:30:24][RANK DRIVER][INFO] --- FINAL TEST SET PERFORMANCE (GRU) ---
+[2025-10-06 11:30:24][RANK DRIVER][INFO]   Test Accuracy: 0.6961
+[2025-10-06 11:30:46][RANK DRIVER][INFO] 
+Cleaning up temporary directories...

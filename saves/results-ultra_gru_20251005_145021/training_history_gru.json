@@ -1,0 +1,15 @@
+{
+  "model_type": "gru",
+  "train_losses": [
+    0
+  ],
+  "train_accuracies": [
+    0
+  ],
+  "val_losses": [
+    1.1735493824383916
+  ],
+  "val_accuracies": [
+    0.5655089520022526
+  ]
+}
